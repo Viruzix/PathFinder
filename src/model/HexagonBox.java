@@ -11,7 +11,6 @@ public class HexagonBox {
     private int r;
     private int width;
     private int height;
-    private RandevuBox randevuBox;
     //int[][] adjMatrix;
 
     public HexagonBox(int r, int width, int height) {
@@ -23,67 +22,54 @@ public class HexagonBox {
     }
 
     private void initBox() {
-        int x = 0;
-        int y = 0;
+        int temp = (int) (Math.sqrt(3) * r);
+        int x = temp / 2;
+        int y = r;
         int num = 0;
         int acc = 0;
-        int temp = (int) (Math.sqrt(3) * r);
+
 
         while (y < height) {
             while (x < width) {
                 num++;
                 Hexagon hex = new Hexagon(new Point(x, y), r, num);
                 hex.init();
-
                 hexBox.add(hex);
+                ArrayList<MeetPoint> mpoints = new ArrayList<>();
+                Point[] points = hexBox.get(hexBox.size() - 1).getPoints();
+                for (Point p : points) {
+                    ArrayList<Hexagon> hexgs = new ArrayList<>();
+                    for (int i = hexBox.size() - 1; i > 0; i--) {
+                        Hexagon hexTemp = hexBox.get(i);
+                        if (hexTemp.containsPoint(p)){
+                            hexgs.add(hexTemp);
+                        }
+                    }
+                    mpoints.add(new MeetPoint(p, hexgs));
+                }
+                hexBox.get(hexBox.size() - 1).setMeetPoints(mpoints);
+
                 x += temp;
             }
 
             if (acc % 2 == 0) {
-                x = -temp / 2;
+                x = temp;
             } else {
-                x = 0;
+                x = temp / 2;
             }
             acc++;
             y += (1.5 * r);
         }
-        initRandevuBox();
+
     }
 
-    private void initRandevuBox(){
-        randevuBox = new RandevuBox(hexBox);
-        updateHexagons();
-    }
 
-    private void updateHexagons(){
-        ArrayList<RandevuPoint> rdPs = randevuBox.getRandevuPoints();
-        //System.out.println(rdPs.size());
-        for (int i = 0; i < hexBox.size() ; i++) {
-            Hexagon hex = hexBox.get(i);
-            ArrayList<RandevuPoint> newRanPts = new ArrayList<>();
-            Point[] pts = hex.getPoints();
 
-            for (int j = 0; j < pts.length ; j++) {
-                Point p = pts[j];
-                for (RandevuPoint rp : rdPs){
-                    //System.out.println("Hui");
-                    if (rp.sameCoord(p)){
-                        //System.out.println("Pizda");
-                        newRanPts.add(new RandevuPoint(p, rp.getNeighbors()));
-                    }
-
-                }
-            }
-            hexBox.set(i, new Hexagon(newRanPts));
-        }
-    }
 
     public ArrayList<Hexagon> getHexBox() {
         return hexBox;
     }
-    public RandevuBox getRandevuBox(){
-        return randevuBox;
-    }
+
 }
 
 
