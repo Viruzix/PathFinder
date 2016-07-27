@@ -4,16 +4,15 @@ import javafx.event.ActionEvent;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
+import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
-import model.Hexagon;
-import model.HexagonBox;
-import model.MeetPoint;
-import model.MeetPointsBox;
+import model.*;
 
 import java.awt.*;
 import java.util.ArrayList;
+
 
 /**
  * В данном классе после нажатия клавиши Init инициализируются HexagonBox и MeetPointsBox.
@@ -29,10 +28,14 @@ public class Controller {
     public Canvas map;
     public Button initBtn;
     public TextField radLabel;
+    public SplitPane splitPane;
 
+    private int mapWidth;
+    private int mapHeight;
 
     public HexagonBox hexagonBox;
     public MeetPointsBox meetPointsBox;
+
 
 
     public void handleCheck(ActionEvent actionEvent) {
@@ -40,21 +43,30 @@ public class Controller {
         info.appendText(data + "\n");
         coords.setText("");
         ArrayList<Point> ps = parser(data);
-        // Скорее всего нужно быть
+        TestGenerator ts = new TestGenerator(4, 2, 500, 500);
+        //ArrayList<Point> ps1 = parser(ts.generateString());
+        /*for (int i = 0; i < ps.size() - 1; i++) {
+            drawLine(ps.get(i), ps.get(i + 1));
+        }*/
 
-        for (int i = 0; i < ps.size() - 1; i++) {
-            drawLines(ps.get(i), ps.get(i + 1), i);
+        String[] testPaths = ts.getPaths();
+        for(String st: testPaths){
+            ArrayList<Point> pts = parser(st);
+            for (int i = 0; i < pts.size() - 1 ; i++) {
+                drawLine(pts.get(i), pts.get(i + 1));
+            }
         }
 
 
     }
 
-    private void drawLines(Point p1, Point p2, int i) {
+
+    private void drawLine(Point p1, Point p2) {
         Color[] colors = {Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW,
                 Color.DARKGRAY, Color.PURPLE, Color.AQUAMARINE, Color.BURLYWOOD};
         GraphicsContext gc = map.getGraphicsContext2D();
         gc.setLineWidth(1.5);
-        Color temp = colors[(int)((Math.random() * 10000) % 8)];
+        Color temp = colors[(int) ((Math.random() * 10000) % 8)];
         gc.setFill(temp);
         gc.setStroke(temp);
         gc.strokeLine(p1.x, p1.y, p2.x, p2.y);
@@ -67,8 +79,9 @@ public class Controller {
      * Вызывается каждый раз при нажатии на кнопку Init.
      * Отрисовывает гексы на рабочем поле.
      * Инициализирует HexagonBox, MeetPointsBox.
-     * @param r - радиус гекса
-     * @param width ширина рабочего поля
+     *
+     * @param r      - радиус гекса
+     * @param width  ширина рабочего поля
      * @param height высота рабочего поля
      */
 
@@ -100,7 +113,7 @@ public class Controller {
 
 
             }
-            for (MeetPoint rp: meetPoints){
+            for (MeetPoint rp : meetPoints) {
                 Point p = rp.toPoint();
                 gc.fillOval(p.x - 5, p.y - 5, 10, 10);
                 gc.setFill(Color.WHITE);
@@ -115,6 +128,7 @@ public class Controller {
 
     /**
      * Парсит строку и возвращает список Point
+     *
      * @param st строка полученная через ui
      * @return коорды
      */
@@ -135,14 +149,23 @@ public class Controller {
     }
 
 
-    /** Обработчик кнопки Init
+    /**
+     * Обработчик кнопки Init
+     *
      * @param actionEvent
      */
     public void handleInit(ActionEvent actionEvent) {
+        /*mapWidth = (int)splitPane.getHeight() - 20;
+
+        mapHeight = (int)splitPane.getWidth() - 80;
+        System.out.println(mapHeight + " " + mapHeight + " " + map.getLayoutX() + " " + map.getLayoutY());
+        map.setLayoutX(10);
+        map.setLayoutY(40);*/
         GraphicsContext gc = map.getGraphicsContext2D();
+
         gc.setFill(Color.WHITE);
-        gc.fillRect(0, 0, 500, 500);
+        gc.fillRect(0, 0, 800, 800);
         int r = Integer.parseInt(radLabel.getText());
-        initCanvas(r, 500, 500);
+        initCanvas(r, 800, 800);
     }
 }
